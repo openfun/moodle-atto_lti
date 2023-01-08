@@ -1,0 +1,14 @@
+{
+  "name": "moodle-atto_lti-button",
+  "builds": {
+    "moodle-atto_lti-button": {
+      "jsfiles": [
+        "button.js",
+        "lti-dialogue.js",
+        "templates/lti-embedded.js",
+        "templates/lti-form.js",
+        "css-selectors.js"
+      ]
+    }
+  }
+}
