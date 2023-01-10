@@ -48,30 +48,22 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
          * @private
          */
         _displayDialogue: function() {
-            var host = this.get('host');
-            // Store the current selection.
-            this._currentSelection = this.get('host').getSelection();
-
-            if (this._currentSelection === false) {
-                return;
-            }
-
-            var currentDiv = this._getLTIDiv();
-
             var dialogue = this.getDialogue({
                 headerContent: M.util.get_string('pluginname', Y.M.atto_lti.COMPONENTNAME),
                 width: 'auto',
                 focusAfterHide: true
             });
+            var thisButton = this;
             // Set the dialogue content, and then show the dialogue.
             Y.M.atto_lti.Dialogue.setDialogueContent(this, function(form) {
                 dialogue.set('bodyContent', form).show();
-                M.form.shortforms({formid: host.get('elementid') + '_atto_lti_form'});
+                M.form.shortforms({formid: thisButton.get('host').get('elementid') + '_atto_lti_form'});
                 form.one("." + Y.M.atto_lti.CSS_SELECTORS.INPUTSUBMIT).on('click', function (e) {
                     e.preventDefault();
+                    thisButton._setLTI(1);
                 }, this);
             });
-            this._setLTI(currentDiv);
+
         },
         /**
          * Get the LTI iframe
@@ -93,10 +85,11 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
          * Update the lti in the contenteditable.
          *
          * @method _setLTI
-         * @param {Element} currentDiv
+         * @param {number} ltiTypeID lti type id
          * @private
          */
-        _setLTI: function(currentDiv) {
+        _setLTI: function(ltiTypeID) {
+            var currentDiv = this._getLTIDiv();
             var host = this.get('host');
             // Focus on the editor in preparation for inserting the H5P.
             host.focus();
@@ -109,19 +102,20 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                 currentDiv.remove();
                 addParagraphs = false;
             }
+            var thisButton = this;
             require(['core/ajax','core/notification'], function(Ajax, Notification) {
                 var args = {
-                    'typeid': 1,
-                    'instanceid': 1,
+                    'typeid': ltiTypeID,
+                    'instanceid': 12345,
                 };
                 Ajax.call([{methodname: 'atto_lti_fetch_param', args: args}])[0]
                     .then(
                         function (data) {
-                            var ltiTemplate = Y.Handlebars.compile(Y.M.atto_lti.LTI_TEMPLATE, data);
+                            var ltiTemplate = Y.Handlebars.compile(Y.M.atto_lti.LTI_TEMPLATE);
 
-                            var ltiHtml = ltiTemplate({});
+                            var ltiHtml = ltiTemplate(data);
                             host.insertContentAtFocusPoint(ltiHtml);
-                            this.markUpdated();
+                            thisButton.markUpdated();
                     }
                 ).catch(Notification.exception);
             });

@@ -28,7 +28,7 @@ Y.namespace('M.atto_lti').Dialogue = (function() {
                             var template = Y.Handlebars.compile(Y.M.atto_lti.FORM_TEMPLATE);
                             var content = Y.Node.create(template({
                                 elementid: currentButton.get('host').get('elementid'),
-                                CSS: CSS,
+                                CSS: Y.M.atto_lti.CSS_SELECTORS,
                                 component: Y.M.atto_lti.COMPONENTNAME,
                                 ltitypes : data,
                             }));

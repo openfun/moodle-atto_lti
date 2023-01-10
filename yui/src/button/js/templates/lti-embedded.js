@@ -21,36 +21,17 @@
 Y.namespace('M.atto_lti').LTI_TEMPLATE = '' +
     '{{#if addParagraphs}}<p><br></p>{{/if}}' +
     '<div class="lti-placeholder" contenteditable="false">' +
-    '<iframe id="contentframe" height="600px" width="100%" src="{{launchur}}" allow="microphone {{ltiallowurl}}; ' +
+    '<iframe id="contentframe" height="600px" width="100%" src="{{launchurl}}" allow="microphone {{ltiallowurl}}; ' +
     'camera {{ltiallowurl}}; ' +
     'geolocation {{ltiallowurl}}; ' +
     'midi {{ltiallowurl}}; ' +
     'encrypted-media {{ltiallowurl}}; ' +
     'autoplay {{ltiallowurl}} " allowfullscreen="1">' +
-    '<form action="{{ltiinitiatelogin}}" name="ltiInitiateLoginForm" id="ltiInitiateLoginForm" method="post"' +
-    '   encType="application/x-www-form-urlencoded">' +
-    '  {{#ltiparameters}}' +
-    '   <input type ="hidden" name="{{key}}" value="{{value}}">' +
-    '  {{/ltiparameters}}' +
-    '</form>' +
-    '<script type="text/javascript">' +
-    ' document.ltiInitiateLoginForm.submit();' +
-    '</script>' +
-    '<script type="text/javascript">' +
-    'YUI().use("node", "event", function(Y) {' +
-    '  var doc = Y.one("body");' +
-    '  var frame = Y.one("#contentframe");' +
-    '  var padding = 15;' +
-    ' var lastHeight;' +
-    ' var resize = function() {' +
-    ' var viewportHeight = doc.get("winHeight");' +
-    '   if(lastHeight !== Math.min(doc.get("docHeight"), viewportHeight)){' +
-    '      frame.setStyle("height", viewportHeight - frame.getY() - padding + "px");' +
-    '       lastHeight = Math.min(doc.get("docHeight"), doc.get("winHeight"));' +
-    '  }};' +
-    ' resize();' +
-    ' Y.on("windowresize", resize);' +
-    '   });' +
-    '</script>' +
+    '<div class="att-lti-login-info">' +
+    '{{#loginparameters}}' +
+    '<div class="d-none" data-name="{{key}}" data-value="{{value}}"></div>' +
+    ' {{/loginparameters}}' +
+    '</div>' +
+    '</iframe>' +
     '</div>' +
     '{{#if addParagraphs}}<p><br></p>{{/if}}';

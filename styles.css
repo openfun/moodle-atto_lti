@@ -6,3 +6,7 @@
     cursor: pointer;
     background: url([[pix:atto_lti|icon]]) center center / 100px auto no-repeat #6c757d;
 }
+
+.editor_atto_wrap .lti-placeholder iframe {
+    display: none;
+}

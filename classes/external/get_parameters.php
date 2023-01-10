@@ -79,9 +79,19 @@ class get_parameters extends external_api {
                 $ltiallow .= ':' . $urlparts['port'];
             }
         }
+        $loginparams = [];
+        foreach($loginrequestparams as $key => $value) {
+            $loginparams[] = [
+              'key' => $key,
+              'value' => $value
+            ];
+        }
+
+        $launchurl = new \moodle_url('/lib/editor/atto/plugins/lti/ltilaunch.php', ['id' => $typeid, 'instanceid' => $instanceid ]);
         return [
             'ltiallowurl' => $ltiallow,
-            'loginparameters' => $loginrequestparams
+            'launchurl' => $launchurl->out(false),
+            'loginparameters' => $loginparams
         ];
     }
 
@@ -93,6 +103,7 @@ class get_parameters extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'ltiallowurl' => new external_value(PARAM_URL, 'LTI allow url, for this tool'),
+            'launchurl' =>  new external_value(PARAM_LOCALURL, 'LTI allow url, for this tool'),
             'loginparameters' => new \external_multiple_structure(
                 new external_single_structure([
                     'key' => new external_value(PARAM_ALPHAEXT, 'LTI parameter key', VALUE_REQUIRED),
