@@ -20,14 +20,22 @@
  */
 Y.namespace('M.atto_lti').Dialogue = (function() {
     return {
-        getDialogueContent: function(currentButton) {
-            var template = Y.Handlebars.compile(Y.M.atto_lti.FORM_TEMPLATE);
-            var content = Y.Node.create(template({
-                    elementid: currentButton.get('host').get('elementid'),
-                    CSS: CSS,
-                    component: Y.M.atto_lti.COMPONENTNAME,
-                }));
-            return content;
+        setDialogueContent: function(currentButton, contentCallback) {
+            require(['core/ajax','core/notification'], function(Ajax, Notification) {
+                return Ajax.call([{methodname: 'mod_lti_get_tool_types', args: {}}])[0]
+                    .then(
+                        function (data) {
+                            var template = Y.Handlebars.compile(Y.M.atto_lti.FORM_TEMPLATE);
+                            var content = Y.Node.create(template({
+                                elementid: currentButton.get('host').get('elementid'),
+                                CSS: CSS,
+                                component: Y.M.atto_lti.COMPONENTNAME,
+                                ltitypes : data,
+                            }));
+                            contentCallback(content);
+                        }
+                    ).catch(Notification.exception);
+            });
         },
     };
 }());

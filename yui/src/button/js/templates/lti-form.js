@@ -20,4 +20,13 @@
  */
 Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
     '<form class="atto_form mform" id="{{elementid}}_atto_lti_form">' +
+    '<fieldset>' +
+    '{{#ltitypes}}' +
+    '<input type="radio" id="{{id}}-{{name}}" name="{{name}}" value="{{id}}"><label for="{{id}}-{{name}}">{{name}}</label>' +
+    '{{/ltitypes}}' +
+    '<div class="text-center">' +
+    '<button class="btn btn-secondary {{CSS.INPUTSUBMIT}}" type="submit">' + '' +
+    '{{get_string "pluginname" component}}</button>' +
+    '</div>' +
+    '</fieldset>' +
     '</form>';

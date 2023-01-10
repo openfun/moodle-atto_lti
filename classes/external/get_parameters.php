@@ -64,7 +64,8 @@ class get_parameters extends external_api {
         string $messagetype = 'basic-lti-launch-request',
         string $text = ''
     ): array {
-        global $SESSION;
+        global $SESSION, $CFG;
+        include_once($CFG->dirroot . '/mod/lti/locallib.php');
         $config = lti_get_type_type_config($typeid);
         $loginrequestparams = lti_build_login_request($courseid, $instanceid, null, $config, $messagetype);
         $SESSION->lti_message_hint = "{$courseid},{$config->typeid},{$instanceid}," . base64_encode($title) . ',' .

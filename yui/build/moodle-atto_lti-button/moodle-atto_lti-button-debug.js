@@ -50,6 +50,7 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
          * @private
          */
         _displayDialogue: function() {
+            var host = this.get('host');
             // Store the current selection.
             this._currentSelection = this.get('host').getSelection();
 
@@ -65,14 +66,14 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                 focusAfterHide: true
             });
             // Set the dialogue content, and then show the dialogue.
-            var form =  Y.M.atto_lti.Dialogue.getDialogueContent(this);
-            dialogue.set('bodyContent', form).show();
-            M.form.shortforms({formid: this.get('host').get('elementid') + '_atto_lti_form'});
-            this._setLTI(currentDiv);
-            form.one("." + Y.M.atto_lti.CSS_SELECTORS.INPUTSUBMIT).on('click', function (e) {
-                e.preventDefault();
-                this._setLTI(currentDiv);
+            Y.M.atto_lti.Dialogue.setDialogueContent(this, function(form) {
+                dialogue.set('bodyContent', form).show();
+                M.form.shortforms({formid: host.get('elementid') + '_atto_lti_form'});
+                form.one("." + Y.M.atto_lti.CSS_SELECTORS.INPUTSUBMIT).on('click', function (e) {
+                    e.preventDefault();
                 }, this);
+            });
+            this._setLTI(currentDiv);
         },
         /**
          * Get the LTI iframe
@@ -110,24 +111,21 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                 currentDiv.remove();
                 addParagraphs = false;
             }
-
-            Y.io(M.cfg.wwwroot + '/lib/ajax/service.php', {
-                'method': 'POST',
-                'data': JSON.encode({
-                    'sesskey': M.cfg.sesskey,
+            require(['core/ajax','core/notification'], function(Ajax, Notification) {
+                var args = {
                     'typeid': 1,
                     'instanceid': 1,
-                }),
-                'context': this,
-                on: {
-                    complete: function(id, o) {
-                        var ltiTemplate = Y.Handlebars.compile(Y.M.atto_lti.LTI_TEMPLATE, JSON.decode(o.responseText));
+                };
+                Ajax.call([{methodname: 'atto_lti_fetch_param', args: args}])[0]
+                    .then(
+                        function (data) {
+                            var ltiTemplate = Y.Handlebars.compile(Y.M.atto_lti.LTI_TEMPLATE, data);
 
-                        var ltiHtml = ltiTemplate({});
-                        host.insertContentAtFocusPoint(ltiHtml);
-                        this.markUpdated();
+                            var ltiHtml = ltiTemplate({});
+                            host.insertContentAtFocusPoint(ltiHtml);
+                            this.markUpdated();
                     }
-                },
+                ).catch(Notification.exception);
             });
         },
     }, {
@@ -164,14 +162,22 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
  */
 Y.namespace('M.atto_lti').Dialogue = (function() {
     return {
-        getDialogueContent: function(currentButton) {
-            var template = Y.Handlebars.compile(Y.M.atto_lti.FORM_TEMPLATE);
-            var content = Y.Node.create(template({
-                    elementid: currentButton.get('host').get('elementid'),
-                    CSS: CSS,
-                    component: Y.M.atto_lti.COMPONENTNAME,
-                }));
-            return content;
+        setDialogueContent: function(currentButton, contentCallback) {
+            require(['core/ajax','core/notification'], function(Ajax, Notification) {
+                return Ajax.call([{methodname: 'mod_lti_get_tool_types', args: {}}])[0]
+                    .then(
+                        function (data) {
+                            var template = Y.Handlebars.compile(Y.M.atto_lti.FORM_TEMPLATE);
+                            var content = Y.Node.create(template({
+                                elementid: currentButton.get('host').get('elementid'),
+                                CSS: CSS,
+                                component: Y.M.atto_lti.COMPONENTNAME,
+                                ltitypes : data,
+                            }));
+                            contentCallback(content);
+                        }
+                    ).catch(Notification.exception);
+            });
         },
     };
 }());// This file is part of Moodle - http://moodle.org/
@@ -252,6 +258,15 @@ Y.namespace('M.atto_lti').LTI_TEMPLATE = '' +
  */
 Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
     '<form class="atto_form mform" id="{{elementid}}_atto_lti_form">' +
+    '<fieldset>' +
+    '{{#ltitypes}}' +
+    '<input type="radio" id="{{id}}-{{name}}" name="{{name}}" value="{{id}}"><label for="{{id}}-{{name}}">{{name}}</label>' +
+    '{{/ltitypes}}' +
+    '<div class="text-center">' +
+    '<button class="btn btn-secondary {{CSS.INPUTSUBMIT}}" type="submit">' + '' +
+    '{{get_string "pluginname" component}}</button>' +
+    '</div>' +
+    '</fieldset>' +
     '</form>';
 // This file is part of Moodle - http://moodle.org/
 //
