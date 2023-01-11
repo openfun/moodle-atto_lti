@@ -24,6 +24,15 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
     Y.M.editor_atto.EditorPlugin,
     [],
     {
+        /**
+         * A reference to the current selection at the time that the dialogue
+         * was opened.
+         *
+         * @property _currentSelection
+         * @type Range
+         * @private
+         */
+        _currentSelection: null,
         initializer: function() {
             this.addButton({
                 icon: 'icon',
@@ -38,8 +47,8 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                 keys: '66',
             });
             this.editor.all('.lti-placeholder').setAttribute('contenteditable', 'false');
-            //this.editor.delegate('dblclick', this._handleDblClick, '.lti-placeholder', this);
-            //this.editor.delegate('click', this._handleClick, '.lti-placeholder', this);
+            this.editor.delegate('dblclick', this._handleDblClick, '.lti-placeholder', this);
+            this.editor.delegate('click', this._handleClick, '.lti-placeholder', this);
         },
         /**
          * Display the lti selection tool.
@@ -48,6 +57,12 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
          * @private
          */
         _displayDialogue: function() {
+            // Store the current selection.
+            this._currentSelection = this.get('host').getSelection();
+
+            if (this._currentSelection === false) {
+                return;
+            }
             var dialogue = this.getDialogue({
                 headerContent: M.util.get_string('pluginname', Y.M.atto_lti.COMPONENTNAME),
                 width: 'auto',
@@ -102,6 +117,7 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                 currentDiv.remove();
                 addParagraphs = false;
             }
+            host.setSelection(this._currentSelection);
             var thisButton = this;
             require(['core/ajax','core/notification'], function(Ajax, Notification) {
                 var args = {
@@ -119,6 +135,28 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                     }
                 ).catch(Notification.exception);
             });
+        },
+        /**
+         * Handle a click on a H5P Placeholder.
+         *
+         * @method _handleClick
+         * @param {EventFacade} e
+         * @private
+         */
+        _handleClick: function(e) {
+            var selection = this.get('host').getSelectionFromNode(e.target);
+            if (this.get('host').getSelection() !== selection) {
+                this.get('host').setSelection(selection);
+            }
+        },
+        /**
+         * Handle a double click on a H5P Placeholder.
+         *
+         * @method _handleDblClick
+         * @private
+         */
+        _handleDblClick: function() {
+            this._displayDialogue();
         },
     }, {
         ATTRS: {

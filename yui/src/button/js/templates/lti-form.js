@@ -22,11 +22,22 @@ Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
     '<form class="atto_form mform" id="{{elementid}}_atto_lti_form">' +
     '<fieldset>' +
     '{{#ltitypes}}' +
-    '<input type="radio" id="{{id}}-{{name}}" name="{{name}}" value="{{id}}"><label for="{{id}}-{{name}}">{{name}}</label>' +
+    '<input type="radio" id="{{id}}-{{name}}" name="{{name}}" value="{{id}}"/>' +
+    '<label for="{{id}}-{{name}}">' +
+    '<div class="card">' +
+    '<img class="card-img-top" src="{{urls.icon}}">' +
+    '<div class="card-body">' +
+    '<div class="card-title">' +
+    '<h5 class="card-title">{{name}}</h5>' +
+    '<p class="card-text">{{description}}</p>' +
+    '</div>' +
+    '</div>' +
+    '</div>' +
+    '</label>' +
     '{{/ltitypes}}' +
+    '</fieldset>' +
     '<div class="text-center">' +
     '<button class="btn btn-secondary {{CSS.INPUTSUBMIT}}" type="submit">' + '' +
     '{{get_string "pluginname" component}}</button>' +
     '</div>' +
-    '</fieldset>' +
     '</form>';
