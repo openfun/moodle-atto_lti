@@ -22,8 +22,9 @@ Y.namespace('M.atto_lti').Dialogue = (function() {
     return {
         setDialogueContent: function(currentButton, contentCallback) {
             require(['core/ajax','core/notification'], function(Ajax, Notification) {
-                return Ajax.call([{methodname: 'mod_lti_get_tool_types', args: {}}])[0]
-                    .then(
+                return Ajax.call([{
+                    methodname: 'mod_lti_get_tool_types', args: {}
+                }])[0].then(
                         function (data) {
                             var template = Y.Handlebars.compile(Y.M.atto_lti.FORM_TEMPLATE);
                             var content = Y.Node.create(template({

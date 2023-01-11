@@ -35,30 +35,34 @@
 /**
  * This file contains all necessary code to view a lti activity instance
  *
+ * @package    atto_lti
+ * @copyright  2022 Laurent David <laurent@call-learning.fr>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 require_once("../../../../../config.php");
-require_once($CFG->dirroot.'/mod/lti/lib.php');
-require_once($CFG->dirroot.'/mod/lti/locallib.php');
+require_once($CFG->dirroot . '/mod/lti/lib.php');
+require_once($CFG->dirroot . '/mod/lti/locallib.php');
 
-$typeid = required_param('id', PARAM_INT); // Course Module ID.
-
-if ($typeid) {
-    $config = lti_get_type_type_config($typeid);
-    if ($config->lti_ltiversion === LTI_VERSION_1P3) {
-        //if (!isset($SESSION->lti_initiatelogin_status)) {
-        //    echo lti_initiate_login($cm->course, $id, $lti, $config);
-        //    exit;
-        //} else {
-        //    unset($SESSION->lti_initiatelogin_status);
-        //}
-    }
+$typeid = required_param('id', PARAM_INT); // LTI Activity Type.
+$courseid = optional_param('courseid', SITEID, PARAM_INT); // Course id.
+$instanceid = optional_param('instanceid', 1, PARAM_INT); // Activity instance id.
+$config = lti_get_type_type_config($typeid);
+if ($config->lti_ltiversion === LTI_VERSION_1P3) {
+    /*if (!isset($SESSION->lti_initiatelogin_status)) {
+        echo lti_initiate_login($cm->course, $id, $lti, $config);
+        exit;
+    } else {
+        unset($SESSION->lti_initiatelogin_status);
+    }*/
 }
+
 $typeconfig = lti_get_type_config($typeid);
 $endpoint = $typeconfig['toolurl'];
-$fakeinstance=  (object) array(
-    'id' => 1,
-    'course' => SITEID,
+$mockinstance = (object) array(
+    'id' => $instanceid,
+    'course' => $courseid,
     'name' => '',
     'intro' => '',
     'introformat' => '1',
@@ -67,8 +71,8 @@ $fakeinstance=  (object) array(
     'securetoolurl' => '',
     'instructorchoicesendname' => '1',
     'instructorchoicesendemailaddr' => '1',
-    'instructorchoiceallowroster' => NULL,
-    'instructorchoiceallowsetting' => NULL,
+    'instructorchoiceallowroster' => null,
+    'instructorchoiceallowsetting' => null,
     'instructorcustomparameters' => '',
     'instructorchoiceacceptgrades' => '1',
     'launchcontainer' => LTI_LAUNCH_CONTAINER_EMBED,
@@ -77,5 +81,4 @@ $fakeinstance=  (object) array(
     'showdescriptionlaunch' => '0',
     'icon' => '',
 );
-lti_launch_tool($fakeinstance);
-
+lti_launch_tool($mockinstance);

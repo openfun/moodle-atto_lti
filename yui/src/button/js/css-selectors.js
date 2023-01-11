@@ -19,5 +19,5 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 Y.namespace('M.atto_lti').CSS_SELECTORS = {
-    INPUTSUBMIT : 'atto_lti_entrysubmit',
+    LTI_SELECTOR : '.lti-atto-item',
 };

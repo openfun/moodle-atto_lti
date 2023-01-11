@@ -35,7 +35,19 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
          * @private
          */
         _currentSelection: null,
+
+        /**
+         * A reference to the current selection at the time that the dialogue
+         * was opened.
+         *
+         * @property _courseID
+         * @type number
+         * @private
+         */
+        _courseID: 1,
+
         initializer: function() {
+            this._courseID = this.get('courseid');
             this.addButton({
                 icon: 'icon',
                 iconComponent: 'atto_lti',
@@ -72,13 +84,16 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
             });
             var thisButton = this;
             // Set the dialogue content, and then show the dialogue.
-            Y.M.atto_lti.Dialogue.setDialogueContent(this, function(form) {
-                dialogue.set('bodyContent', form).show();
-                M.form.shortforms({formid: thisButton.get('host').get('elementid') + '_atto_lti_form'});
-                form.one("." + Y.M.atto_lti.CSS_SELECTORS.INPUTSUBMIT).on('click', function (e) {
-                    e.preventDefault();
-                    thisButton._setLTI(1);
-                }, this);
+            Y.M.atto_lti.Dialogue.setDialogueContent(this, function(ltiSelectorForm) {
+                dialogue.set('bodyContent', ltiSelectorForm).show();
+                ltiSelectorForm.all(Y.M.atto_lti.CSS_SELECTORS.LTI_SELECTOR).each(
+                    function (node) {
+                        node.on('click', function (e) {
+                            e.preventDefault();
+                            thisButton._setLTI(Number.parseInt(node.getData().value));
+                            dialogue.close();
+                        }, thisButton);
+                    });
             });
 
         },
@@ -125,6 +140,7 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                 var args = {
                     'typeid': ltiTypeID,
                     'instanceid': 12345,
+                    'courseid' : thisButton.getCourseID()
                 };
                 Ajax.call([{methodname: 'atto_lti_fetch_param', args: args}])[0]
                     .then(
@@ -160,12 +176,30 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
         _handleDblClick: function() {
             this._displayDialogue();
         },
+        /**
+         * Get Course ID
+         *
+         * @method getCourseID
+         * @private
+         */
+        getCourseID: function() {
+            return this._courseID;
+        }
     }, {
         ATTRS: {
             // If any parameters were defined in the 'params_for_js' function,
             // they should be defined here for proper access.
             langs: {
                 value: ['Default', 'Value']
+            },
+            /**
+             * Courseid
+             *
+             * @attribute courseid
+             * @type int
+             */
+            courseid: {
+                value: 1
             }
         }
     }
@@ -196,8 +230,9 @@ Y.namespace('M.atto_lti').Dialogue = (function() {
     return {
         setDialogueContent: function(currentButton, contentCallback) {
             require(['core/ajax','core/notification'], function(Ajax, Notification) {
-                return Ajax.call([{methodname: 'mod_lti_get_tool_types', args: {}}])[0]
-                    .then(
+                return Ajax.call([{
+                    methodname: 'mod_lti_get_tool_types', args: {}
+                }])[0].then(
                         function (data) {
                             var template = Y.Handlebars.compile(Y.M.atto_lti.FORM_TEMPLATE);
                             var content = Y.Node.create(template({
@@ -270,12 +305,9 @@ Y.namespace('M.atto_lti').LTI_TEMPLATE = '' +
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
-    '<form class="atto_form mform" id="{{elementid}}_atto_lti_form">' +
-    '<fieldset>' +
+    '<div class="atto_form mform d-flex" id="{{elementid}}_atto_lti_form">' +
     '{{#ltitypes}}' +
-    '<input type="radio" id="{{id}}-{{name}}" name="{{name}}" value="{{id}}"/>' +
-    '<label for="{{id}}-{{name}}">' +
-    '<div class="card">' +
+    '<a class="lti-atto-item card m-1" data-value="{{id}}" href="#">' +
     '<img class="card-img-top" src="{{urls.icon}}">' +
     '<div class="card-body">' +
     '<div class="card-title">' +
@@ -283,15 +315,9 @@ Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
     '<p class="card-text">{{description}}</p>' +
     '</div>' +
     '</div>' +
-    '</div>' +
-    '</label>' +
+    '</a>' +
     '{{/ltitypes}}' +
-    '</fieldset>' +
-    '<div class="text-center">' +
-    '<button class="btn btn-secondary {{CSS.INPUTSUBMIT}}" type="submit">' + '' +
-    '{{get_string "pluginname" component}}</button>' +
-    '</div>' +
-    '</form>';
+    '</div>';
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -313,7 +339,7 @@ Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 Y.namespace('M.atto_lti').CSS_SELECTORS = {
-    INPUTSUBMIT : 'atto_lti_entrysubmit',
+    LTI_SELECTOR : '.lti-atto-item',
 };
 
 }, '@VERSION@', {"requires": ["moodle-editor_atto-plugin"]});

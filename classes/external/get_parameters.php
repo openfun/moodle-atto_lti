@@ -29,42 +29,38 @@ require_once($CFG->libdir . '/externallib.php');
  *
  * @copyright  2022 Laurent David <laurent@call-learning.fr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    atto_lti
  */
 class get_parameters extends external_api {
     /**
-     * Returns description of method parameters
-     *
-     * @return external_function_parameters
-     */
-    public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters([
-            'typeid' => new external_value(PARAM_INT, 'lti (external tool) type id', VALUE_REQUIRED),
-            'instanceid' => new external_value(PARAM_INT, 'logical instance id (Note: this is not a mod_lti instanceid)',
-                VALUE_REQUIRED),
-            'courseid' => new external_value(PARAM_INT, 'LTI course id', VALUE_OPTIONAL, 0),
-            'title' => new external_value(PARAM_TEXT, 'LTI title', VALUE_OPTIONAL, ''),
-            'messagetype' => new external_value(PARAM_ALPHAEXT, 'LTI message type', VALUE_OPTIONAL, 'basic-lti-launch-request'),
-            'text' => new external_value(PARAM_ALPHAEXT, 'LTI message text', VALUE_OPTIONAL, ''),
-        ]);
-    }
-
-    /**
      * Get all parameters to build an LTI iframe
      *
-     * @param int $typeid the type id for the external tool / LTI
      * @param int|null $typeid the type id for the external tool / LTI
+     * @param int $instanceid
+     * @param int|bool $courseid
+     * @param string $title
+     * @param string $messagetype
+     * @param string $text
      * @return array (empty array for now)
+     * @throws \invalid_parameter_exception
      * @throws \restricted_context_exception
      */
     public static function execute(
         int $typeid,
         int $instanceid,
-        int $courseid = 0,
+        int $courseid = SITEID,
         string $title = '',
         string $messagetype = 'basic-lti-launch-request',
         string $text = ''
     ): array {
         global $SESSION, $CFG;
+        self::validate_parameters(
+            self::execute_parameters(),
+            compact('typeid', 'instanceid', 'courseid', 'title', 'messagetype', 'text')
+        );
+        $context = \context_course::instance($courseid);
+        self::validate_context($context);
+
         include_once($CFG->dirroot . '/mod/lti/locallib.php');
         $config = lti_get_type_type_config($typeid);
         $loginrequestparams = lti_build_login_request($courseid, $instanceid, null, $config, $messagetype);
@@ -80,19 +76,40 @@ class get_parameters extends external_api {
             }
         }
         $loginparams = [];
-        foreach($loginrequestparams as $key => $value) {
+        foreach ($loginrequestparams as $key => $value) {
             $loginparams[] = [
-              'key' => $key,
-              'value' => $value
+                'key' => $key,
+                'value' => $value
             ];
         }
 
-        $launchurl = new \moodle_url('/lib/editor/atto/plugins/lti/ltilaunch.php', ['id' => $typeid, 'instanceid' => $instanceid ]);
+        $launchurl = new \moodle_url('/lib/editor/atto/plugins/lti/ltilaunch.php', [
+            'id' => $typeid,
+            'instanceid' => $instanceid,
+            'courseid' => $courseid
+        ]);
         return [
             'ltiallowurl' => $ltiallow,
-            'launchurl' => $launchurl->out(false),
+            'launchurl' => $launchurl->out(true),
             'loginparameters' => $loginparams
         ];
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function execute_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'typeid' => new external_value(PARAM_INT, 'lti (external tool) type id', VALUE_REQUIRED),
+            'instanceid' => new external_value(PARAM_INT, 'logical instance id (Note: this is not a mod_lti instanceid)',
+                VALUE_REQUIRED),
+            'courseid' => new external_value(PARAM_INT, 'LTI course id', VALUE_OPTIONAL, SITEID),
+            'title' => new external_value(PARAM_TEXT, 'LTI title', VALUE_OPTIONAL, ''),
+            'messagetype' => new external_value(PARAM_ALPHAEXT, 'LTI message type', VALUE_OPTIONAL, 'basic-lti-launch-request'),
+            'text' => new external_value(PARAM_ALPHAEXT, 'LTI message text', VALUE_OPTIONAL, ''),
+        ]);
     }
 
     /**
@@ -103,7 +120,7 @@ class get_parameters extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'ltiallowurl' => new external_value(PARAM_URL, 'LTI allow url, for this tool'),
-            'launchurl' =>  new external_value(PARAM_LOCALURL, 'LTI allow url, for this tool'),
+            'launchurl' => new external_value(PARAM_LOCALURL, 'LTI allow url, for this tool'),
             'loginparameters' => new \external_multiple_structure(
                 new external_single_structure([
                     'key' => new external_value(PARAM_ALPHAEXT, 'LTI parameter key', VALUE_REQUIRED),

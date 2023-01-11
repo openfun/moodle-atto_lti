@@ -19,12 +19,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
-    '<form class="atto_form mform" id="{{elementid}}_atto_lti_form">' +
-    '<fieldset>' +
+    '<div class="atto_form mform d-flex" id="{{elementid}}_atto_lti_form">' +
     '{{#ltitypes}}' +
-    '<input type="radio" id="{{id}}-{{name}}" name="{{name}}" value="{{id}}"/>' +
-    '<label for="{{id}}-{{name}}">' +
-    '<div class="card">' +
+    '<a class="lti-atto-item card m-1" data-value="{{id}}" href="#">' +
     '<img class="card-img-top" src="{{urls.icon}}">' +
     '<div class="card-body">' +
     '<div class="card-title">' +
@@ -32,12 +29,6 @@ Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
     '<p class="card-text">{{description}}</p>' +
     '</div>' +
     '</div>' +
-    '</div>' +
-    '</label>' +
+    '</a>' +
     '{{/ltitypes}}' +
-    '</fieldset>' +
-    '<div class="text-center">' +
-    '<button class="btn btn-secondary {{CSS.INPUTSUBMIT}}" type="submit">' + '' +
-    '{{get_string "pluginname" component}}</button>' +
-    '</div>' +
-    '</form>';
+    '</div>';

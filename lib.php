@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
  * Atto text editor integration version file.
  *
@@ -22,7 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Set params for this button.
@@ -32,7 +30,10 @@ defined('MOODLE_INTERNAL') || die();
  * @param stdClass $fpoptions - unused.
  */
 function atto_lti_params_for_js($elementid, $options, $fpoptions) {
-    $params = [];
+    global $PAGE;
+    $params = [
+        'courseid' => $PAGE->course->id
+    ];
     return $params;
 }
 

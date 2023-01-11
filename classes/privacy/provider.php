@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace atto_lti\privacy;
-
 /**
  * Privacy Subsystem for atto_lti implementing null_provider.
  *
  * @copyright  2022 Laurent David <laurent@call-learning.fr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    atto_lti
  */
 class provider implements \core_privacy\local\metadata\null_provider {
 
