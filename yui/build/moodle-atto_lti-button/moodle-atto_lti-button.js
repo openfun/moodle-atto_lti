@@ -36,18 +36,7 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
          */
         _currentSelection: null,
 
-        /**
-         * A reference to the current selection at the time that the dialogue
-         * was opened.
-         *
-         * @property _courseID
-         * @type number
-         * @private
-         */
-        _courseID: 1,
-
         initializer: function() {
-            this._courseID = this.get('courseid');
             this.addButton({
                 icon: 'icon',
                 iconComponent: 'atto_lti',
@@ -82,21 +71,28 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                 width: 'auto',
                 focusAfterHide: true
             });
-            var thisButton = this;
             // Set the dialogue content, and then show the dialogue.
-            Y.M.atto_lti.Dialogue.setDialogueContent(this, function(ltiSelectorForm) {
-                dialogue.set('bodyContent', ltiSelectorForm).show();
-                ltiSelectorForm.all(Y.M.atto_lti.CSS_SELECTORS.LTI_SELECTOR).each(
-                    function (node) {
-                        node.on('click', function (e) {
-                            e.preventDefault();
-                            thisButton._setLTI(Number.parseInt(node.getData().value));
-                            dialogue.close();
-                        }, thisButton);
-                    });
-            });
+            Y.M.atto_lti.Dialogue.setDialogueContent(this, this._displayForm.bind(this, dialogue));
 
         },
+        /**
+         *
+         * @param {ModalDialog }dialogue
+         * @param {Y.Node} ltiSelectorForm
+         * @private
+         */
+        _displayForm: function(dialogue, ltiSelectorForm) {
+            dialogue.set('bodyContent', ltiSelectorForm).show();
+            ltiSelectorForm.all(Y.M.atto_lti.CSS_SELECTORS.LTI_SELECTOR).each(
+                function(node) {
+                    node.on('click', function (e) {
+                        e.preventDefault();
+                        this._setLTI(Number.parseInt(node.getData().value));
+                        dialogue.close();
+                    }, this);
+                });
+        },
+
         /**
          * Get the LTI iframe
          *
@@ -140,7 +136,7 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                 var args = {
                     'typeid': ltiTypeID,
                     'instanceid': 12345,
-                    'courseid' : thisButton.getCourseID()
+                    'courseid' : thisButton.get("courseid")
                 };
                 Ajax.call([{methodname: 'atto_lti_fetch_param', args: args}])[0]
                     .then(
@@ -176,15 +172,6 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
         _handleDblClick: function() {
             this._displayDialogue();
         },
-        /**
-         * Get Course ID
-         *
-         * @method getCourseID
-         * @private
-         */
-        getCourseID: function() {
-            return this._courseID;
-        }
     }, {
         ATTRS: {
             // If any parameters were defined in the 'params_for_js' function,
@@ -200,6 +187,15 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
              */
             courseid: {
                 value: 1
+            },
+            /**
+             * Content Item URL
+             *
+             * @attribute contentitemurl
+             * @type string
+             */
+            contentitemurl: {
+                value: ""
             }
         }
     }
@@ -240,6 +236,7 @@ Y.namespace('M.atto_lti').Dialogue = (function() {
                                 CSS: Y.M.atto_lti.CSS_SELECTORS,
                                 component: Y.M.atto_lti.COMPONENTNAME,
                                 ltitypes : data,
+                                contentitemurl : currentButton.get('contentitemurl')
                             }));
                             contentCallback(content);
                         }
@@ -313,6 +310,11 @@ Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
     '<div class="card-title">' +
     '<h5 class="card-title">{{name}}</h5>' +
     '<p class="card-text">{{description}}</p>' +
+    '<button class="btn btn-secondary ml-0 selectcontent" ' +
+    ' name="selectcontent-{{elementid}}" id="id_selectcontent-{{elementid}}" ' +
+    ' type="button" data-contentitemurl="{{contentitemurl}}">\n' +
+    '                {{selectcontentLabel}}' +
+    '                </button>' +
     '</div>' +
     '</div>' +
     '</a>' +

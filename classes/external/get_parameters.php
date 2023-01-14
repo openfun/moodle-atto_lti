@@ -25,7 +25,7 @@ global $CFG;
 require_once($CFG->libdir . '/externallib.php');
 
 /**
- * LTI paramter helper of atto_lti implementing.
+ * LTI paramter helper of atto_lti implementation.
  *
  * @copyright  2022 Laurent David <laurent@call-learning.fr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

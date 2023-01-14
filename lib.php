@@ -32,7 +32,8 @@
 function atto_lti_params_for_js($elementid, $options, $fpoptions) {
     global $PAGE;
     $params = [
-        'courseid' => $PAGE->course->id
+        'courseid' => $PAGE->course->id,
+        'contentitemurl' => (new moodle_url('/mod/lti/contentitem.php'))->out(false)
     ];
     return $params;
 }

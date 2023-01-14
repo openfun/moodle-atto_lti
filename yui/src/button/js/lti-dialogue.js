@@ -32,6 +32,7 @@ Y.namespace('M.atto_lti').Dialogue = (function() {
                                 CSS: Y.M.atto_lti.CSS_SELECTORS,
                                 component: Y.M.atto_lti.COMPONENTNAME,
                                 ltitypes : data,
+                                contentitemurl : currentButton.get('contentitemurl')
                             }));
                             contentCallback(content);
                         }

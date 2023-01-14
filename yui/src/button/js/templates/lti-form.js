@@ -27,6 +27,11 @@ Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
     '<div class="card-title">' +
     '<h5 class="card-title">{{name}}</h5>' +
     '<p class="card-text">{{description}}</p>' +
+    '<button class="btn btn-secondary ml-0 selectcontent" ' +
+    ' name="selectcontent-{{elementid}}" id="id_selectcontent-{{elementid}}" ' +
+    ' type="button" data-contentitemurl="{{contentitemurl}}">\n' +
+    '                {{selectcontentLabel}}' +
+    '                </button>' +
     '</div>' +
     '</div>' +
     '</a>' +
