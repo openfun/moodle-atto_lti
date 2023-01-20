@@ -44,10 +44,10 @@
 require_once("../../../../../config.php");
 require_once($CFG->dirroot . '/mod/lti/lib.php');
 require_once($CFG->dirroot . '/mod/lti/locallib.php');
-
 $typeid = required_param('id', PARAM_INT); // LTI Activity Type.
 $courseid = optional_param('courseid', SITEID, PARAM_INT); // Course id.
 $instanceid = optional_param('instanceid', 1, PARAM_INT); // Activity instance id.
+require_course_login($courseid);
 $config = lti_get_type_type_config($typeid);
 if ($config->lti_ltiversion === LTI_VERSION_1P3) {
     /*if (!isset($SESSION->lti_initiatelogin_status)) {

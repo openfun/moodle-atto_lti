@@ -35,14 +35,15 @@ class get_parameters extends external_api {
     /**
      * Get all parameters to build an LTI iframe
      *
-     * @param int|null $typeid the type id for the external tool / LTI
+     * @param int $typeid the type id for the external tool / LTI
      * @param int $instanceid
-     * @param int|bool $courseid
+     * @param int $courseid
      * @param string $title
      * @param string $messagetype
      * @param string $text
      * @return array (empty array for now)
      * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
      * @throws \restricted_context_exception
      */
     public static function execute(

@@ -23,3 +23,4 @@
 
 $string['pluginname'] = 'Insert LTI';
 $string['privacy:metadata'] = 'The atto_lti plugin does not store any personal data.';
+$string['selectlti'] = 'Select';

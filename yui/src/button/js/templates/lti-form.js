@@ -19,21 +19,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
-    '<div class="atto_form mform d-flex" id="{{elementid}}_atto_lti_form">' +
+    '<div class="atto_form mform d-flex" id="{{ elementid }}_atto_lti_form">' +
     '{{#ltitypes}}' +
-    '<a class="lti-atto-item card m-1" data-value="{{id}}" href="#">' +
-    '<img class="card-img-top" src="{{urls.icon}}">' +
+    '<div class="card m-1">' +
+    '<img class="card-img-top" src="{{ urls.icon }}">' +
     '<div class="card-body">' +
     '<div class="card-title">' +
-    '<h5 class="card-title">{{name}}</h5>' +
-    '<p class="card-text">{{description}}</p>' +
-    '<button class="btn btn-secondary ml-0 selectcontent" ' +
-    ' name="selectcontent-{{elementid}}" id="id_selectcontent-{{elementid}}" ' +
-    ' type="button" data-contentitemurl="{{contentitemurl}}">\n' +
-    '                {{selectcontentLabel}}' +
-    '                </button>' +
+    '<h5 class="card-title">{{ name }}</h5>' +
+    '<p class="card-text">{{ description }}</p>' +
+    '<button class="btn btn-secondary ml-0 lti-content-selector" ' +
+    ' name="selectcontent-{{ id }}" id="id_selectcontent-{{ id }}" ' +
+    ' type="button" data-contentitemurl="{{ ../contentitemurl }}" data-value="{{ id }}">\n' +
+    '                {{get_string "selectlti" ../component}}' +
+    '</button>' +
     '</div>' +
     '</div>' +
-    '</a>' +
+    '</div>' +
     '{{/ltitypes}}' +
     '</div>';

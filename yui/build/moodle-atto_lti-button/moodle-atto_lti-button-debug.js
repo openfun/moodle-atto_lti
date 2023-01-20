@@ -82,13 +82,28 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
          * @private
          */
         _displayForm: function(dialogue, ltiSelectorForm) {
+            var courseid = this.get('courseid');
+            var thisButton = this;
             dialogue.set('bodyContent', ltiSelectorForm).show();
             ltiSelectorForm.all(Y.M.atto_lti.CSS_SELECTORS.LTI_SELECTOR).each(
                 function(node) {
                     node.on('click', function (e) {
                         e.preventDefault();
-                        this._setLTI(Number.parseInt(node.getData().value));
-                        dialogue.close();
+                        require(['mod_lti/contentitem'], function(contentitem) {
+                            var contentItemUrl = node.getData('contentitemurl');
+                            // Set data to be POSTed.
+                            var postData = {
+                                id: node.getData('value'),
+                                course: courseid,
+                                title: '',
+                                text: ''
+                            };
+                            contentitem.init(contentItemUrl, postData, function() {
+                                M.mod_lti.editor.toggleGradeSection();
+                            });
+                            thisButton._setLTI(Number.parseInt(node.getData().value));
+                            dialogue.hide();
+                        });
                     }, this);
                 });
         },
@@ -302,22 +317,22 @@ Y.namespace('M.atto_lti').LTI_TEMPLATE = '' +
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
-    '<div class="atto_form mform d-flex" id="{{elementid}}_atto_lti_form">' +
+    '<div class="atto_form mform d-flex" id="{{ elementid }}_atto_lti_form">' +
     '{{#ltitypes}}' +
-    '<a class="lti-atto-item card m-1" data-value="{{id}}" href="#">' +
-    '<img class="card-img-top" src="{{urls.icon}}">' +
+    '<div class="card m-1">' +
+    '<img class="card-img-top" src="{{ urls.icon }}">' +
     '<div class="card-body">' +
     '<div class="card-title">' +
-    '<h5 class="card-title">{{name}}</h5>' +
-    '<p class="card-text">{{description}}</p>' +
-    '<button class="btn btn-secondary ml-0 selectcontent" ' +
-    ' name="selectcontent-{{elementid}}" id="id_selectcontent-{{elementid}}" ' +
-    ' type="button" data-contentitemurl="{{contentitemurl}}">\n' +
-    '                {{selectcontentLabel}}' +
-    '                </button>' +
+    '<h5 class="card-title">{{ name }}</h5>' +
+    '<p class="card-text">{{ description }}</p>' +
+    '<button class="btn btn-secondary ml-0 lti-content-selector" ' +
+    ' name="selectcontent-{{ id }}" id="id_selectcontent-{{ id }}" ' +
+    ' type="button" data-contentitemurl="{{ ../contentitemurl }}" data-value="{{ id }}">\n' +
+    '                {{get_string "selectlti" ../component}}' +
+    '</button>' +
     '</div>' +
     '</div>' +
-    '</a>' +
+    '</div>' +
     '{{/ltitypes}}' +
     '</div>';
 // This file is part of Moodle - http://moodle.org/
@@ -341,7 +356,7 @@ Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 Y.namespace('M.atto_lti').CSS_SELECTORS = {
-    LTI_SELECTOR : '.lti-atto-item',
+    LTI_SELECTOR : '.lti-content-selector',
 };
 
 }, '@VERSION@', {"requires": ["moodle-editor_atto-plugin"]});

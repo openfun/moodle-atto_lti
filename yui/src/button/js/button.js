@@ -80,13 +80,28 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
          * @private
          */
         _displayForm: function(dialogue, ltiSelectorForm) {
+            var courseid = this.get('courseid');
+            var thisButton = this;
             dialogue.set('bodyContent', ltiSelectorForm).show();
             ltiSelectorForm.all(Y.M.atto_lti.CSS_SELECTORS.LTI_SELECTOR).each(
                 function(node) {
                     node.on('click', function (e) {
                         e.preventDefault();
-                        this._setLTI(Number.parseInt(node.getData().value));
-                        dialogue.close();
+                        require(['mod_lti/contentitem'], function(contentitem) {
+                            var contentItemUrl = node.getData('contentitemurl');
+                            // Set data to be POSTed.
+                            var postData = {
+                                id: node.getData('value'),
+                                course: courseid,
+                                title: '',
+                                text: ''
+                            };
+                            contentitem.init(contentItemUrl, postData, function() {
+                                M.mod_lti.editor.toggleGradeSection();
+                            });
+                            thisButton._setLTI(Number.parseInt(node.getData().value));
+                            dialogue.hide();
+                        });
                     }, this);
                 });
         },

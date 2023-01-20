@@ -45,7 +45,8 @@ function atto_lti_strings_for_js() {
     global $PAGE;
 
     $strings = [
-        'pluginname'
+        'pluginname',
+        'selectlti'
     ];
 
     $PAGE->requires->strings_for_js($strings, 'atto_lti');
