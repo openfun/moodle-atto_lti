@@ -76,6 +76,7 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
 
         },
         /**
+         * Display the LTI selector form
          *
          * @param {ModalDialog }dialogue
          * @param {Y.Node} ltiSelectorForm
@@ -101,7 +102,15 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                             contentitem.init(contentItemUrl, postData, function() {
                                 M.mod_lti.editor.toggleGradeSection();
                             });
-                            thisButton._setLTI(Number.parseInt(node.getData().value));
+                            var ltiTypeID = Number.parseInt(node.getData().value);
+
+                            // Hack here to get the data returned.
+                            var processContentItemReturnDataCallBack = window.processContentItemReturnData;
+                            window.processContentItemReturnData = function(returnData) {
+                                thisButton._setLTI(ltiTypeID, returnData.toolurl);
+                                processContentItemReturnDataCallBack(returnData);
+                            };
+
                             dialogue.hide();
                         });
                     }, this);
@@ -128,10 +137,11 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
          * Update the lti in the contenteditable.
          *
          * @method _setLTI
-         * @param {number} ltiTypeID lti type id
+         * @param {number} ltiTypeID LTI type id
+         * @param {string} toolURL LTI tool URL
          * @private
          */
-        _setLTI: function(ltiTypeID) {
+        _setLTI: function(ltiTypeID, toolURL) {
             var currentDiv = this._getLTIDiv();
             var host = this.get('host');
             // Focus on the editor in preparation for inserting the H5P.
@@ -151,7 +161,8 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                 var args = {
                     'typeid': ltiTypeID,
                     'instanceid': 12345,
-                    'courseid' : thisButton.get("courseid")
+                    'courseid' : thisButton.get("courseid"),
+                    'toolurl' : toolURL
                 };
                 Ajax.call([{methodname: 'atto_lti_fetch_param', args: args}])[0]
                     .then(

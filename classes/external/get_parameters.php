@@ -38,6 +38,7 @@ class get_parameters extends external_api {
      * @param int $typeid the type id for the external tool / LTI
      * @param int $instanceid
      * @param int $courseid
+     * @param string $toolurl
      * @param string $title
      * @param string $messagetype
      * @param string $text
@@ -50,6 +51,7 @@ class get_parameters extends external_api {
         int $typeid,
         int $instanceid,
         int $courseid = SITEID,
+        string $toolurl = '',
         string $title = '',
         string $messagetype = 'basic-lti-launch-request',
         string $text = ''
@@ -57,7 +59,7 @@ class get_parameters extends external_api {
         global $SESSION, $CFG;
         self::validate_parameters(
             self::execute_parameters(),
-            compact('typeid', 'instanceid', 'courseid', 'title', 'messagetype', 'text')
+            compact('typeid', 'instanceid', 'courseid', 'toolurl', 'title', 'messagetype', 'text')
         );
         $context = \context_course::instance($courseid);
         self::validate_context($context);
@@ -87,11 +89,12 @@ class get_parameters extends external_api {
         $launchurl = new \moodle_url('/lib/editor/atto/plugins/lti/ltilaunch.php', [
             'id' => $typeid,
             'instanceid' => $instanceid,
-            'courseid' => $courseid
+            'courseid' => $courseid,
+            'toolurl' => $toolurl
         ]);
         return [
             'ltiallowurl' => $ltiallow,
-            'launchurl' => $launchurl->out(true),
+            'launchurl' => $launchurl->out(false),
             'loginparameters' => $loginparams
         ];
     }
@@ -107,6 +110,7 @@ class get_parameters extends external_api {
             'instanceid' => new external_value(PARAM_INT, 'logical instance id (Note: this is not a mod_lti instanceid)',
                 VALUE_REQUIRED),
             'courseid' => new external_value(PARAM_INT, 'LTI course id', VALUE_OPTIONAL, SITEID),
+            'toolurl' => new external_value(PARAM_URL, 'LTI tool url', VALUE_OPTIONAL, ''),
             'title' => new external_value(PARAM_TEXT, 'LTI title', VALUE_OPTIONAL, ''),
             'messagetype' => new external_value(PARAM_ALPHAEXT, 'LTI message type', VALUE_OPTIONAL, 'basic-lti-launch-request'),
             'text' => new external_value(PARAM_ALPHAEXT, 'LTI message text', VALUE_OPTIONAL, ''),
