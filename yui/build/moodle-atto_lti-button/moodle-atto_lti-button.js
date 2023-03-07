@@ -44,7 +44,6 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                 // Watch the following tags and add/remove highlighting as appropriate:
                 tags: '.lti-placeholder',
                 tagMatchRequiresAll: false,
-                inlineFormat: true,
 
                 // Key code for the keyboard shortcut which triggers this button:
                 keys: '66',
