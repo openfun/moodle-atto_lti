@@ -104,12 +104,15 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                             var ltiTypeID = Number.parseInt(node.getData().value);
 
                             // Hack here to get the data returned.
-                            var processContentItemReturnDataCallBack = window.processContentItemReturnData;
+                            // Original processContentItemReturnData is stored in window
+                            // to prevent multiple wrapping.
+                            if (!window.originalProcessContentItemReturnData) {
+                                window.originalProcessContentItemReturnData = window.processContentItemReturnData;
+                            }
                             window.processContentItemReturnData = function(returnData) {
                                 thisButton._setLTI(ltiTypeID, returnData.toolurl);
-                                processContentItemReturnDataCallBack(returnData);
+                                window.originalProcessContentItemReturnData(returnData);
                             };
-
                             dialogue.hide();
                         });
                     }, this);
