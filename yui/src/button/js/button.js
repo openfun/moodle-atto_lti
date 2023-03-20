@@ -42,9 +42,6 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                 // Watch the following tags and add/remove highlighting as appropriate:
                 tags: '.lti-placeholder',
                 tagMatchRequiresAll: false,
-
-                // Key code for the keyboard shortcut which triggers this button:
-                keys: '66',
             });
             this.editor.all('.lti-placeholder').setAttribute('contenteditable', 'false');
             this.editor.delegate('dblclick', this._handleDblClick, '.lti-placeholder', this);
@@ -108,7 +105,7 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                                 window.originalProcessContentItemReturnData = window.processContentItemReturnData;
                             }
                             window.processContentItemReturnData = function(returnData) {
-                                thisButton._setLTI(ltiTypeID, returnData.toolurl);
+                                thisButton._setLTI(ltiTypeID, returnData.toolurl, returnData.name);
                                 window.originalProcessContentItemReturnData(returnData);
                             };
                             dialogue.hide();
@@ -141,7 +138,7 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
          * @param {string} toolURL LTI tool URL
          * @private
          */
-        _setLTI: function(ltiTypeID, toolURL) {
+        _setLTI: function(ltiTypeID, toolURL, name) {
             var currentDiv = this._getLTIDiv();
             var host = this.get('host');
             // Focus on the editor in preparation for inserting the H5P.
@@ -169,6 +166,8 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                         function (data) {
                             var ltiTemplate = Y.Handlebars.compile(Y.M.atto_lti.LTI_TEMPLATE);
 
+                            data.addParagraphs = addParagraphs;
+                            data.name = name;
                             var ltiHtml = ltiTemplate(data);
                             host.insertContentAtFocusPoint(ltiHtml);
                             thisButton.markUpdated();

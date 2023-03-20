@@ -21,12 +21,11 @@
 Y.namespace('M.atto_lti').LTI_TEMPLATE = '' +
     '{{#if addParagraphs}}<p><br></p>{{/if}}' +
     '<div class="lti-placeholder" contenteditable="false">' +
-    '<iframe id="contentframe" height="600px" width="100%" src="{{launchurl}}" allow="microphone {{ltiallowurl}}; ' +
+    '{{name}}' +
+    '<iframe height="260px" width="100%" src="{{launchurl}}" allow="microphone {{ltiallowurl}}; ' +
     'camera {{ltiallowurl}}; ' +
     'geolocation {{ltiallowurl}}; ' +
-    'midi {{ltiallowurl}}; ' +
-    'encrypted-media {{ltiallowurl}}; ' +
-    'autoplay {{ltiallowurl}} " allowfullscreen="1">' +
+    '>' +
     '<div class="att-lti-login-info">' +
     '{{#loginparameters}}' +
     '<div class="d-none" data-name="{{key}}" data-value="{{value}}"></div>' +
