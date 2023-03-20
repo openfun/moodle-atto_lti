@@ -105,6 +105,8 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                                 window.originalProcessContentItemReturnData = window.processContentItemReturnData;
                             }
                             window.processContentItemReturnData = function(returnData) {
+                                // we don't want the introeditor content to be replaced
+                                delete returnData.introeditor;
                                 thisButton._setLTI(ltiTypeID, returnData.toolurl, returnData.name);
                                 window.originalProcessContentItemReturnData(returnData);
                             };
