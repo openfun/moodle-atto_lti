@@ -2,4 +2,10 @@
     width: 100%;
     word-break: break-all;
     cursor: pointer;
+    background: url([[pix:atto_lti|icon]]) center center / 100px auto no-repeat #6c757d;
+    padding: 20px 0;
+}
+
+.editor_atto_content_wrap .lti-placeholder iframe {
+    background-color: #fff;
 }
