@@ -109,7 +109,7 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                                     window.originalProcessContentItemReturnData = window.processContentItemReturnData;
                                 }
                                 window.processContentItemReturnData = function(returnData) {
-                                    thisButton._setLTI(ltiTypeID, returnData.toolurl);
+                                    thisButton._setLTI(ltiTypeID, returnData.toolurl, returnData.name);
                                     window.originalProcessContentItemReturnData(returnData);
                                 };
 
@@ -151,9 +151,10 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
          * @method _setLTI
          * @param {number} ltiTypeID LTI type id
          * @param {string} toolURL LTI tool URL
+         * @param {string} name LTI tool name
          * @private
          */
-        _setLTI: function(ltiTypeID, toolURL) {
+        _setLTI: function(ltiTypeID, toolURL, name) {
             var currentDiv = this._getLTIDiv();
             var host = this.get('host');
             // Focus on the editor in preparation for inserting the LTI.
@@ -175,6 +176,7 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                         function(data) {
                             var ltiTemplate = Y.Handlebars.compile(Y.M.atto_lti.LTI_TEMPLATE);
 
+                            data.name = name;
                             var ltiHtml = ltiTemplate(data);
                             host.insertContentAtFocusPoint(ltiHtml);
                             thisButton.markUpdated();
@@ -301,12 +303,11 @@ Y.namespace('M.atto_lti').Dialogue = (function() {
 Y.namespace('M.atto_lti').LTI_TEMPLATE = '' +
     '{{#if addParagraphs}}<p><br></p>{{/if}}' +
     '<div class="lti-placeholder" contenteditable="false">' +
-    '<iframe id="contentframe" height="600px" width="100%" src="{{launchurl}}" allow="microphone {{ltiallowurl}}; ' +
+    '{{name}}' +
+    '<iframe height="260px" width="100%" src="{{launchurl}}" allow="microphone {{ltiallowurl}}; ' +
     'camera {{ltiallowurl}}; ' +
     'geolocation {{ltiallowurl}}; ' +
-    'midi {{ltiallowurl}}; ' +
-    'encrypted-media {{ltiallowurl}}; ' +
-    'autoplay {{ltiallowurl}} " allowfullscreen="1">' +
+    '>' +
     '<div class="att-lti-login-info">' +
     '{{#loginparameters}}' +
     '<div class="d-none" data-name="{{key}}" data-value="{{value}}"></div>' +
