@@ -68,7 +68,7 @@ $mockinstance = (object) array(
     'instructorchoicesendemailaddr' => '1',
     'instructorchoiceallowroster' => null,
     'instructorchoiceallowsetting' => null,
-    'instructorcustomparameters' => '',
+    'instructorcustomparameters' => 'embedded_resource=1',
     'instructorchoiceacceptgrades' => '1',
     'launchcontainer' => LTI_LAUNCH_CONTAINER_EMBED,
     'debuglaunch' => '0',
