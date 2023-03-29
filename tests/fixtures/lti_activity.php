@@ -1,3 +1,4 @@
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -13,11 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
+/**
+ * Testing fixture for LTI activity.
+ *
  * @package    atto_lti
  * @copyright  2022 Laurent David <laurent@call-learning.fr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-Y.namespace('M.atto_lti').CSS_SELECTORS = {
-    LTI_SELECTOR: '.lti-content-selector',
-};
+// phpcs:ignoreFile
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Testing fixture for LTI activity</title>
+</head>
+<body>
+<h1>Testing fixture for LTI activity</h1>
+<p>Testing fixture for LTI activity</p>
+</body>
+</html>

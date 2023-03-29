@@ -22,17 +22,17 @@ Y.namespace('M.atto_lti').FORM_TEMPLATE = '' +
     '<div class="atto_form mform d-flex" id="{{ elementid }}_atto_lti_form">' +
     '{{#ltitypes}}' +
     '<div class="card m-1">' +
-    '<img class="card-img-top" src="{{ urls.icon }}">' +
-    '<div class="card-body">' +
-    '<div class="card-title">' +
-    '<h5 class="card-title">{{ name }}</h5>' +
-    '<p class="card-text">{{ description }}</p>' +
-    '<button class="btn btn-secondary ml-0 lti-content-selector" ' +
+    '<div class="card-header d-flex" data-toggle="tooltip" data-placement="top" title="{{ description }}">' +
+    '<img class="img-thumbnail" src="{{ urls.icon }}" alt="{{ name }}">' +
+    '<h5 class="m-auto">{{ name }}</h5>' +
+    '</div>' +
+    '<div class="card-body d-flex">' +
+    '<button class="m-auto btn btn-secondary ml-0 lti-content-selector" ' +
     ' name="selectcontent-{{ id }}" id="id_selectcontent-{{ id }}" ' +
-    ' type="button" data-contentitemurl="{{ ../contentitemurl }}" data-value="{{ id }}">\n' +
+    ' type="button" {{#hascontentitemurl}}data-contentitemurl="{{ ../../contentitemurl }}"{{/hascontentitemurl}}' +
+    ' data-value="{{ id }}" data-title="{{ name }}">\n' +
     '                {{get_string "selectlti" ../component}}' +
     '</button>' +
-    '</div>' +
     '</div>' +
     '</div>' +
     '{{/ltitypes}}' +

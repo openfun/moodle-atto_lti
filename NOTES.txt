@@ -1,0 +1,13 @@
+### Implementation notes
+
+The plugin is trying to use the mod_lti libraries and implementations as much as possible.
+The aim is to list preconfigured external tools and eventually display a content selector if this
+is set in the external tool.
+
+However, there are a couple of setback:
+* Most of the LTI API function need to have a module id attached to the instance/iframe. There
+are hopefully not necessary in all callback and set to 0 whenever possible
+* We tried to use the external.php library from the mod_lti but get_tool_types for example was
+not retuning the config for the tool so we did not know how to handle the content selector for this
+kind of resources.
+

@@ -31,6 +31,15 @@ $functions = [
         'type'        => 'read',
         'ajax'          => true,
         'loginrequired' => true,
-        'capabilities' => 'mod/lti:manage',
+        'capabilities' => 'mod/lti:addpreconfiguredinstance',
+    ],
+    'atto_lti_get_tool_types_config' => [
+        'classname'   => \atto_lti\external\get_tool_types_config::class,
+        'methodname'  => 'execute',
+        'description' => 'Get all tool types information.',
+        'type'        => 'read',
+        'ajax'          => true,
+        'loginrequired' => true,
+        'capabilities' => 'mod/lti:addpreconfiguredinstance',
     ],
 ];

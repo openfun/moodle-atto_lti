@@ -41,11 +41,7 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
                 callback: this._displayDialogue,
                 // Watch the following tags and add/remove highlighting as appropriate:
                 tags: '.lti-placeholder',
-                tagMatchRequiresAll: false,
-                inlineFormat: true,
-
-                // Key code for the keyboard shortcut which triggers this button:
-                keys: '66',
+                tagMatchRequiresAll: false
             });
             this.editor.all('.lti-placeholder').setAttribute('contenteditable', 'false');
             this.editor.delegate('dblclick', this._handleDblClick, '.lti-placeholder', this);
@@ -86,32 +82,41 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
             dialogue.set('bodyContent', ltiSelectorForm).show();
             ltiSelectorForm.all(Y.M.atto_lti.CSS_SELECTORS.LTI_SELECTOR).each(
                 function(node) {
-                    node.on('click', function (e) {
-                        e.preventDefault();
-                        require(['mod_lti/contentitem'], function(contentitem) {
-                            var contentItemUrl = node.getData('contentitemurl');
-                            // Set data to be POSTed.
-                            var postData = {
-                                id: node.getData('value'),
-                                course: courseid,
-                                title: '',
-                                text: ''
-                            };
-                            contentitem.init(contentItemUrl, postData, function() {
-                                M.mod_lti.editor.toggleGradeSection();
+                    var contentItemUrl = node.getData('contentitemurl');
+                    var ltiTypeID = Number.parseInt(node.getData().value);
+                    if (contentItemUrl) {
+                        node.on('click', function(e) {
+                            e.preventDefault();
+                            require(['mod_lti/contentitem'], function(contentitem) {
+                                var contentItemUrl = node.getData('contentitemurl');
+                                // Set data to be POSTed.
+                                var postData = {
+                                    id: node.getData('value'),
+                                    course: courseid,
+                                    title: '',
+                                    text: ''
+                                };
+                                contentitem.init(contentItemUrl, postData, function() {
+                                    M.mod_lti.editor.toggleGradeSection();
+                                });
+
+                                // Hack here to get the data returned.
+                                var processContentItemReturnDataCallBack = window.processContentItemReturnData;
+                                window.processContentItemReturnData = function(returnData) {
+                                    thisButton._setLTI(ltiTypeID, returnData.toolurl);
+                                    processContentItemReturnDataCallBack(returnData);
+                                };
+
+                                dialogue.hide();
                             });
-                            var ltiTypeID = Number.parseInt(node.getData().value);
-
-                            // Hack here to get the data returned.
-                            var processContentItemReturnDataCallBack = window.processContentItemReturnData;
-                            window.processContentItemReturnData = function(returnData) {
-                                thisButton._setLTI(ltiTypeID, returnData.toolurl);
-                                processContentItemReturnDataCallBack(returnData);
-                            };
-
+                        }, this);
+                    } else {
+                        node.on('click', function(e) {
+                            e.preventDefault();
+                            thisButton._setLTI(ltiTypeID, "");
                             dialogue.hide();
                         });
-                    }, this);
+                    }
                 });
         },
 
@@ -124,6 +129,9 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
         _getLTIDiv: function() {
             var selectednodes = this.get('host').getSelectedNodes();
             var LTIDiv = null;
+            if (!selectednodes) {
+                return null;
+            }
             selectednodes.each(function(selNode) {
                 if (selNode.hasClass('lti-placeholder')) {
                     LTIDiv = selNode;
@@ -142,40 +150,35 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
         _setLTI: function(ltiTypeID, toolURL) {
             var currentDiv = this._getLTIDiv();
             var host = this.get('host');
-            // Focus on the editor in preparation for inserting the H5P.
+            // Focus on the editor in preparation for inserting the LTI.
             host.focus();
-
-            // Add an empty paragraph after new H5P container that can catch the cursor.
-            var addParagraphs = true;
-
             // If a LTI placeholder was selected we can destroy it now.
             if (currentDiv) {
                 currentDiv.remove();
-                addParagraphs = false;
             }
             host.setSelection(this._currentSelection);
             var thisButton = this;
-            require(['core/ajax','core/notification'], function(Ajax, Notification) {
+            require(['core/ajax', 'core/notification'], function(Ajax, Notification) {
                 var args = {
                     'typeid': ltiTypeID,
-                    'instanceid': 12345,
-                    'courseid' : thisButton.get("courseid"),
-                    'toolurl' : toolURL
+                    'courseid': thisButton.get("courseid"),
+                    'toolurl': toolURL
                 };
                 Ajax.call([{methodname: 'atto_lti_fetch_param', args: args}])[0]
                     .then(
-                        function (data) {
+                        function(data) {
                             var ltiTemplate = Y.Handlebars.compile(Y.M.atto_lti.LTI_TEMPLATE);
 
                             var ltiHtml = ltiTemplate(data);
                             host.insertContentAtFocusPoint(ltiHtml);
                             thisButton.markUpdated();
+                            return true;
                     }
                 ).catch(Notification.exception);
             });
         },
         /**
-         * Handle a click on a H5P Placeholder.
+         * Handle a click on a LTI Placeholder.
          *
          * @method _handleClick
          * @param {EventFacade} e
@@ -188,7 +191,7 @@ Y.namespace('M.atto_lti').Button = Y.Base.create(
             }
         },
         /**
-         * Handle a double click on a H5P Placeholder.
+         * Handle a double click on a LTI Placeholder.
          *
          * @method _handleDblClick
          * @private

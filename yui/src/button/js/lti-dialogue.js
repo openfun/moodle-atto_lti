@@ -21,20 +21,21 @@
 Y.namespace('M.atto_lti').Dialogue = (function() {
     return {
         setDialogueContent: function(currentButton, contentCallback) {
-            require(['core/ajax','core/notification'], function(Ajax, Notification) {
+            require(['core/ajax', 'core/notification'], function(Ajax, Notification) {
                 return Ajax.call([{
-                    methodname: 'mod_lti_get_tool_types', args: {}
+                    methodname: 'atto_lti_get_tool_types_config', args: {}
                 }])[0].then(
-                        function (data) {
+                        function(data) {
                             var template = Y.Handlebars.compile(Y.M.atto_lti.FORM_TEMPLATE);
                             var content = Y.Node.create(template({
                                 elementid: currentButton.get('host').get('elementid'),
                                 CSS: Y.M.atto_lti.CSS_SELECTORS,
                                 component: Y.M.atto_lti.COMPONENTNAME,
-                                ltitypes : data,
-                                contentitemurl : currentButton.get('contentitemurl')
+                                ltitypes: data,
+                                contentitemurl: currentButton.get('contentitemurl')
                             }));
                             contentCallback(content);
+                            return true;
                         }
                     ).catch(Notification.exception);
             });

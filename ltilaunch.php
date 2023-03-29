@@ -46,17 +46,13 @@ require_once($CFG->dirroot . '/mod/lti/lib.php');
 require_once($CFG->dirroot . '/mod/lti/locallib.php');
 $typeid = required_param('id', PARAM_INT); // LTI Activity Type.
 $courseid = optional_param('courseid', SITEID, PARAM_INT); // Course id.
-$instanceid = optional_param('instanceid', 1, PARAM_INT); // Activity instance id.
 $toolurl = optional_param('toolurl', '', PARAM_URL); // Activity instance id.
 require_course_login($courseid);
 $config = lti_get_type_type_config($typeid);
-
-// TODO: deal with LTI_VERSION_1P3.
-
 $typeconfig = lti_get_type_config($typeid);
 $endpoint = $typeconfig['toolurl'];
 $mockinstance = (object) array(
-    'id' => $instanceid,
+    'id' => 0,
     'course' => $courseid,
     'name' => '',
     'intro' => '',
@@ -76,4 +72,8 @@ $mockinstance = (object) array(
     'showdescriptionlaunch' => '0',
     'icon' => '',
 );
+if ($config->lti_ltiversion === LTI_VERSION_1P3) {
+    $content = lti_initiate_login($courseid, 0, $mockinstance, $config);
+}
+
 lti_launch_tool($mockinstance);
